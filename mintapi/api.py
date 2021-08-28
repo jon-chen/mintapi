@@ -11,6 +11,7 @@ import requests
 import subprocess
 from sys import platform as _platform
 import time
+from typing import Sequence
 import zipfile
 import imaplib
 import email
@@ -1041,6 +1042,30 @@ class Mint(object):
 
         return budgets
 
+    def get_trends(self, account_ids: Sequence[str], date_range_period: str = 'L3M'):  # {{{
+        trends_header = self._get_api_key_header()
+
+        # Issue request for budget utilization
+        url = "{}/trendData.xevent".format(MINT_ROOT_URL)
+        searchQuery = {
+            "reportType": "AT",
+            "chartType": "H",
+            "matchAny": True,
+            "accounts": {
+                "accountIds": account_ids
+            },
+            "dateRange": {
+                "period": {
+                    "value": date_range_period
+                }
+            },
+            "categoryTypeFilter": "all"
+        }
+        data = {"searchQuery": searchQuery, "token": self.token}
+        response = json.loads(self.post(url, data=data, headers=trends_header).text)
+
+        return response
+
     def get_category_from_id(self, cid, categories):
         category = self.get_category_object_from_id(cid, categories)
         return category['name']
@@ -1238,6 +1263,23 @@ def main():
         dest='budget_hist',
         default=None,
         help='Retrieve 12-month budget history information')
+    cmdline.add_argument(
+        '--trends',
+        action='store_true',
+        dest='trends',
+        default=None,
+        help='Retrieve trends information.')
+    cmdline.add_argument(
+        '--trends-account-ids',
+        dest='trends_account_ids',
+        nargs='*',
+        default=None,
+        help='The account ids to retrieve for trends. One or more values are required for trends information.')
+    cmdline.add_argument(
+        '--trends-period',
+        dest='trends_period',
+        default='L3M',
+        help='The date range period to retrieve trend information for. Default: Last 3 Months.')
     cmdline.add_argument(
         '--net-worth',
         action='store_true',
@@ -1462,6 +1504,13 @@ def main():
         try:
             data = mint.get_budgets(hist=12)
         except Exception:
+            data = None
+    elif options.trends:
+        try:
+            data = mint.get_trends(account_ids=options.trends_account_ids, 
+                date_range_period=options.trends_period)
+        except Exception as ex:
+            logging.error(ex)
             data = None
     elif options.accounts:
         try:
