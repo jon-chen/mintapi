@@ -1064,8 +1064,8 @@ class Mint(object):
             },
             "categoryTypeFilter": "all"
         }
-        data = {"searchQuery": searchQuery, "token": self.token}
-        payload = parse.urlencode(data)
+        data = {"searchQuery": parse.quote(json.dumps(searchQuery)), "token": self.token}
+        payload = parse.urlencode(data, safe='%')
         # https://qxf2.com/blog/python-mechanize-replace/
         payload = payload.replace("%27","%22")
 
