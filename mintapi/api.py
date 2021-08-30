@@ -1066,12 +1066,10 @@ class Mint(object):
         }
         data = {"searchQuery": parse.quote(json.dumps(searchQuery)), "token": self.token}
         payload = parse.urlencode(data, safe='%')
-        # https://qxf2.com/blog/python-mechanize-replace/
-        payload = payload.replace("%27","%22")
 
         logger.debug(payload)
 
-        result = self.post(url, data=payload.encode(), headers=trends_header)
+        result = self.post(url, data=payload, headers=trends_header)
 
         if result.status_code != 200:
             raise MintException('Received HTTP error %d' % result.status_code)
