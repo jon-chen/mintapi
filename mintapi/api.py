@@ -1065,7 +1065,11 @@ class Mint(object):
             "categoryTypeFilter": "all"
         }
         data = {"searchQuery": searchQuery, "token": self.token}
-        result = self.post(url, data=parse.urlencode(data), headers=trends_header)
+        payload = parse.urlencode(data)
+
+        logger.debug(payload)
+
+        result = self.post(url, data=payload, headers=trends_header)
 
         if result.status_code != 200:
             raise MintException('Received HTTP error %d' % result.status_code)
