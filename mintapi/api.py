@@ -18,6 +18,7 @@ import email
 import email.header
 import sys  # DEBUG
 import warnings
+from urllib import parse
 
 try:
     from StringIO import StringIO  # Python 2
@@ -1064,7 +1065,7 @@ class Mint(object):
             "categoryTypeFilter": "all"
         }
         data = {"searchQuery": searchQuery, "token": self.token}
-        result = self.post(url, data=data, headers=trends_header)
+        result = self.post(url, data=parse.urlencode(data), headers=trends_header)
 
         if result.status_code != 200:
             raise MintException('Received HTTP error %d' % result.status_code)
