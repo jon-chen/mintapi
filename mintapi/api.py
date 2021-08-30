@@ -1043,7 +1043,9 @@ class Mint(object):
         return budgets
 
     def get_trends(self, account_ids: Sequence[str], date_range_period: str = 'L3M'):  # {{{
-        trends_header = self._get_api_key_header()
+        trends_header = {
+            "Content-Type": "application/x-www-form-urlencoded",
+        }
 
         # Issue request for budget utilization
         url = "{}/trendData.xevent".format(MINT_ROOT_URL)
@@ -1062,7 +1064,12 @@ class Mint(object):
             "categoryTypeFilter": "all"
         }
         data = {"searchQuery": searchQuery, "token": self.token}
-        response = json.loads(self.post(url, data=data, headers=trends_header).text)
+        result = self.post(url, data=data, headers=trends_header)
+
+        if result.status_code != 200:
+            raise MintException('Received HTTP error %d' % result.status_code)
+
+        response = json.loads(result).text
 
         return response
 
