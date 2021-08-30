@@ -1074,7 +1074,7 @@ class Mint(object):
         if result.status_code != 200:
             raise MintException('Received HTTP error %d' % result.status_code)
 
-        response = json.loads(result).text
+        response = json.loads(result.text)
 
         return response
 
