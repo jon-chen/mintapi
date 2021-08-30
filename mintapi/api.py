@@ -1065,7 +1065,7 @@ class Mint(object):
             "categoryTypeFilter": "all"
         }
         data = {"searchQuery": searchQuery, "token": self.token}
-        payload = parse.urlencode(data)
+        payload = parse.urlencode(data).encode()
 
         logger.debug(payload)
 
